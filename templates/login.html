@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>TourGuard_AI - Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap)" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; font-family: 'Poppins', sans-serif; }
+
+  /* Scene base */
+  body {
+    position: relative;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(1000px 520px at 50% -120px, #2a3a75 0%, #10152b 70%) no-repeat,
+                linear-gradient(180deg, #0c1230 0%, #111535 45%, #1a1f46 70%, #13162e 100%);
+    color: #fff;
+  }
+
+  /* Stars */
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 8%, rgba(255,255,255,0.8), transparent 60%),
+      radial-gradient(1.2px 1.2px at 28% 18%, rgba(120,220,255,0.9), transparent 60%),
+      radial-gradient(0.9px 0.9px at 52% 12%, rgba(255,255,255,0.7), transparent 60%),
+      radial-gradient(1.1px 1.1px at 70% 22%, rgba(120,220,255,0.8), transparent 60%),
+      radial-gradient(0.8px 0.8px at 86% 10%, rgba(255,255,255,0.6), transparent 60%);
+    background-size: 300px 180px;
+    background-repeat: repeat;
+    opacity: 0.65;
+    animation: twinkle 5s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+  @keyframes twinkle { from { opacity: .35; } to { opacity: .9; } }
+
+  /* Moon glow */
+  .moon {
+    position: absolute; top: 8%; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 120px; border-radius: 50%;
+    background: radial-gradient(circle, #fffbe6 0 48%, #ffd27a 52%, rgba(255,210,122,0.0) 70%);
+    box-shadow: 0 0 80px 28px rgba(120,200,255,0.25);
+    filter: saturate(.9);
+    z-index: 1;
+  }
+
+  /* Clouds */
+  .cloud { position: absolute; top: 12%; width: 120px; height: 44px; opacity: .75; z-index: 2; animation: cloudMove linear infinite; }
+  .cloud.small { width: 90px; height: 32px; opacity: .6; animation-duration: 42s; }
+  .cloud.mid   { width: 140px; height: 50px; opacity: .7; animation-duration: 36s; }
+  .cloud.big   { width: 180px; height: 60px; opacity: .65; animation-duration: 54s; }
+  .cloud svg { width: 100%; height: 100%; }
+  @keyframes cloudMove { from { transform: translateX(-140px); } to { transform: translateX(110vw); } }
+
+  /* Parallax hills */
+  .hills { position: absolute; inset: auto 0 90px 0; height: 55%; z-index: 2; }
+  .hill {
+    position: absolute; inset: auto 0 0 0; width: 200%; height: 100%;
+    background-repeat: repeat-x; background-position: bottom;
+  }
+  .hill.back {
+    background-color: #1b1f48;
+    opacity: .55;
+    clip-path: polygon(0 100%,0 65%,8% 52%,16% 68%,24% 50%,33% 66%,42% 48%,50% 64%,58% 50%,67% 66%,75% 48%,83% 62%,91% 55%,100% 63%,100% 100%);
+    animation: driftSlow 60s linear infinite;
+  }
+  .hill.mid {
+    background-color: #22265a;
+    opacity: .8;
+    clip-path: polygon(0 100%,0 72%,10% 54%,20% 74%,30% 54%,40% 72%,50% 50%,60% 70%,70% 52%,80% 72%,90% 55%,100% 68%,100% 100%);
+    animation: driftMed 40s linear infinite;
+  }
+  .hill.front {
+    background: linear-gradient(180deg, #1a1e44 0%, #131735 100%);
+    clip-path: polygon(0 100%,0 78%,12% 60%,25% 80%,38% 56%,50% 80%,62% 60%,75% 82%,88% 60%,100% 78%,100% 100%);
+    animation: driftFast 24s linear infinite;
+  }
+  @keyframes driftSlow { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes driftMed  { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes driftFast { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* Grid glow overlay (subtle) */
+  .grid-overlay {
+    position: absolute; inset: auto 0 90px 0; height: 48%; z-index: 3;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.10) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.10) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: linear-gradient(to top, black, transparent);
+    -webkit-mask-image: linear-gradient(to top, black, transparent);
+    animation: gridPulse 7s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes gridPulse { 0%,100% { opacity: .45; } 50% { opacity: .9; } }
+
+  /* Road */
+  .road {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 90px; z-index: 6;
+    background: #0f1224; border-top: 3px solid #2a2f57;
+  }
+  .road::before {
+    content: ""; position: absolute; top: 44px; left: 0; width: 200%; height: 6px;
+    background-image: repeating-linear-gradient(90deg, #ffd76a 0 40px, transparent 40px 75px);
+    animation: roadMove 1.35s linear infinite;
+  }
+  @keyframes roadMove { from { transform: translateX(0); } to { transform: translateX(-75px); } }
+
+  /* Vehicles */
+  .car, .bike { position: absolute; bottom: 16px; font-size: 34px; z-index: 7; animation-timing-function: linear; animation-iteration-count: infinite; text-shadow: 0 0 10px rgba(0,229,255,0.35); }
+  .car  { animation-name: driveCar;  animation-duration: 9s;  bottom: 14px; }
+  .bike { animation-name: driveBike; animation-duration: 6.8s; bottom: 18px; font-size: 28px; }
+  @keyframes driveCar  { from { left: -60px; } to { left: 110%; } }
+  @keyframes driveBike { from { left: -40px; } to { left: 110%; } }
+
+  /* Rain (bursts) */
+  .rain {
+    position: absolute; inset: 0; pointer-events: none; z-index: 4; overflow: hidden;
+  }
+  .drop {
+    position: absolute; top: -20px; width: 1.5px; height: 40px; background: linear-gradient(180deg, rgba(170,200,255,0.0) 0%, rgba(170,200,255,0.8) 60%, rgba(170,200,255,0.0) 100%);
+    filter: blur(.2px);
+    animation: fall var(--speed,1.2s) linear infinite;
+    opacity: var(--op,.8);
+  }
+  @keyframes fall { to { transform: translateY(110vh); } }
+
+  /* Mist / fog waves */
+  .mist {
+    position: absolute; bottom: 90px; left: -20vw; width: 140vw; height: 26vh; z-index: 5;
+    background: radial-gradient(60% 80% at 30% 70%, rgba(180,200,255,0.12), transparent 70%),
+                radial-gradient(60% 80% at 70% 60%, rgba(180,200,255,0.10), transparent 70%);
+    filter: blur(8px);
+    animation: mistDrift 18s ease-in-out infinite;
+    opacity: .0;
+  }
+  .mist.show { opacity: .55; transition: opacity 2.5s ease; }
+  @keyframes mistDrift {
+    0% { transform: translateX(-4%) translateY(0); }
+    50% { transform: translateX(4%) translateY(-2%); }
+    100% { transform: translateX(-4%) translateY(0); }
+  }
+
+  /* Header + card */
+  .scene-center { position: relative; z-index: 8; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .brand-wrap { text-align: center; }
+  .brand-wrap h1 {
+    font-size: 34px; font-weight: 800; color: #fff;
+    text-shadow: 0 0 18px rgba(0,229,255,0.65), 0 2px 10px rgba(0,0,0,0.5);
+    letter-spacing: .5px;
+  }
+  .brand-wrap p { color: rgba(255,255,255,0.85); font-size: 13px; margin-top: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+
+  .login-box {
+    width: 340px; padding: 34px 36px; text-align: center;
+    background: rgba(10,15,30,0.55);
+    border: 1px solid rgba(0,229,255,0.35);
+    border-radius: 18px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 30px rgba(0,229,255,0.18), 0 20px 45px rgba(0,0,0,0.45);
+  }
+  .login-box input {
+    width: 100%; padding: 13px; margin-bottom: 15px; border: none; border-radius: 10px; font-size: 14px; background: rgba(255,255,255,0.94);
+  }
+  .login-box button {
+    width: 100%; padding: 14px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, #ff6a3d, #ee0979); color: #fff; font-weight: 600; font-size: 15px; cursor: pointer; transition: .3s;
+  }
+  .login-box button:hover { transform: translateY(-2px); box-shadow: 0 0 22px rgba(0,229,255,0.55), 0 8px 18px rgba(238,9,121,0.4); }
+
+  .footer-credit { position: fixed; bottom: 8px; right: 14px; font-size: 10.5px; color: rgba(255,255,255,0.45); z-index: 9; }
+
+  /* Responsive tweaks */
+  @media (max-width: 480px) {
+    .moon { top: 6%; width: 96px; height: 96px; }
+    .login-box { width: 88vw; max-width: 360px; }
+    .grid-overlay { height: 42%; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Layers -->
+  <div class="stars"></div>
+  <div class="moon"></div>
+
+  <!-- Clouds -->
+  <div class="cloud small" style="top:16%; animation-delay:-12s;">
+    <svg viewBox="0 0 100 40" xmlns="[w3.org](http://www.w3.org/2000/svg)">
+      <ellipse cx="30" cy="25" rx="28" ry="14" fill="rgba(255,255,255,0.55)"/>
+      <ellipse cx="55" cy="18" rx="22" ry="16" fill="rgba(255,255,255,0.55)"/>
+      <ellipse cx="75" cy="25" rx="20" ry="12" fill="rgba(255,255,255,0.55)"/>
+    </svg>
+  </div>
+  <div class="cloud mid" style="top:22%; animation-delay:-4s;">
+    <svg viewBox="0 0 100 40" xmlns="[w3.org](http://www.w3.org/2000/svg)">
+      <ellipse cx="30" cy="25" rx="28" ry="14" fill="rgba(255,255,255,0.5)"/>
+      <ellipse cx="55" cy="18" rx="22" ry="16" fill="rgba(255,255,255,0.5)"/>
+      <ellipse cx="75" cy="25" rx="20" ry="12" fill="rgba(255,255,255,0.5)"/>
+    </svg>
+  </div>
+  <div class="cloud big" style="top:28%; animation-delay:-22s;">
+    <svg viewBox="0 0 100 40" xmlns="[w3.org](http://www.w3.org/2000/svg)">
+      <ellipse cx="30" cy="25" rx="28" ry="14" fill="rgba(255,255,255,0.45)"/>
+      <ellipse cx="55" cy="18" rx="22" ry="16" fill="rgba(255,255,255,0.45)"/>
+      <ellipse cx="75" cy="25" rx="20" ry="12" fill="rgba(255,255,255,0.45)"/>
+    </svg>
+  </div>
+
+  <!-- Hills -->
+  <div class="hills">
+    <div class="hill back"></div>
+    <div class="hill mid"></div>
+    <div class="hill front"></div>
+  </div>
+
+  <!-- Subtle grid over hills -->
+  <div class="grid-overlay"></div>
+
+  <!-- Mist (toggles on/off by JS) -->
+  <div class="mist" id="mist"></div>
+
+  <!-- Rain container (drops injected by JS) -->
+  <div class="rain" id="rain"></div>
+
+  <!-- Road + vehicles -->
+  <div class="road">
+    <div class="car">🚗</div>
+    <div class="bike">🏍️</div>
+  </div>
+
+  <!-- UI -->
+  <div class="scene-center">
+    <div class="brand-wrap">
+      <h1>🏔 TourGuard_AI</h1>
+      <p>Your Smart Travel Safety Companion</p>
+    </div>
+
+    <div class="login-box">
+      <form action="/login" method="POST">
+        <input type="text" name="username" placeholder="Username" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer-credit">Developed by Senthooran M</div>
+
+<script>
+  // Rain generator with periodic bursts
+  (function initRain() {
+    const container = document.getElementById('rain');
+    const vw = () => Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const dropCount = () => Math.floor(vw() / 12); // density based on width
+
+    function spawnOnce() {
+      const n = dropCount();
+      for (let i = 0; i < n; i++) {
+        const d = document.createElement('div');
+        d.className = 'drop';
+        const x = Math.random() * 100;
+        const delay = Math.random() * 1.2;
+        const speed = 0.9 + Math.random() * 0.9;
+        const op = 0.55 + Math.random() * 0.35;
+        d.style.left = x + 'vw';
+        d.style.animationDelay = delay + 's';
+        d.style.setProperty('--speed', speed + 's');
+        d.style.setProperty('--op', op);
+        container.appendChild(d);
+        // cleanup a bit later
+        setTimeout(() => d.remove(), (delay + speed + 0.2) * 1000);
+      }
+    }
+
+    // Pattern: 6s raining, 8s dry, repeat
+    function cycle() {
+      spawnOnce();
+      const burst = setInterval(spawnOnce, 600);
+      setTimeout(() => {
+        clearInterval(burst);
+        setTimeout(cycle, 8000);
+      }, 6000);
+    }
+    cycle();
+
+    // Resize responsiveness
+    window.addEventListener('resize', () => { /* density scales next burst */ });
+  })();
+
+  // Mist: soft waves that show up occasionally
+  (function initMist() {
+    const mist = document.getElementById('mist');
+    function toggle(show) { mist.classList.toggle('show', show); }
+    function schedule() {
+      toggle(true);
+      // show for 7–11s
+      setTimeout(() => toggle(false), 7000 + Math.random() * 4000);
+      // wait 8–14s then show again
+      setTimeout(schedule, 15000 + Math.random() * 7000);
+    }
+    // small initial delay
+    setTimeout(schedule, 3000);
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Report - TourGuard_AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            background: #060d14;
+            min-height: 100vh;
+            padding: 40px 20px;
+            perspective: 1200px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(0,229,255,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,229,255,0.06) 1px, transparent 1px);
+            background-size: 45px 45px;
+            animation: gridMove 20s linear infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 45px 45px; }
+        }
+        .top-bar {
+            max-width: 800px;
+            margin: 0 auto 25px auto;
+            color: white;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .top-bar h1 { font-size: 30px; font-weight: 700; }
+        .top-bar p { opacity: 0.8; margin-top: 5px; }
+        .wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            gap: 18px;
+            position: relative;
+            z-index: 1;
+        }
+        .card {
+            background: rgba(6,20,30,0.75);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0,229,255,0.25);
+            padding: 25px 30px;
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 0 15px rgba(0,229,255,0.08), 0 10px 25px rgba(0,0,0,0.2);
+            transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+        }
+        .card:hover {
+            transform: translateY(-8px) scale(1.015);
+            box-shadow: 0 0 30px rgba(0,229,255,0.35), 0 20px 40px rgba(0,0,0,0.4);
+            border-color: rgba(0,229,255,0.6);
+        }
+        .card h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #ffb84d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .card ul { list-style: none; }
+        .card li {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 14.5px;
+        }
+        .card li:last-child { border-bottom: none; }
+        .risk-badge {
+            display: inline-block;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 18px;
+            background: rgba(255,255,255,0.15);
+        }
+        .weather-row { display: flex; gap: 30px; flex-wrap: wrap; }
+        .weather-row div { font-size: 15px; }
+        .weather-row span { display: block; font-size: 22px; font-weight: 700; }
+        .btn-group { display: flex; gap: 15px; margin-top: 10px; }
+        button, .back-link {
+            padding: 14px 26px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        button {
+            background: linear-gradient(135deg, #ff6a00, #ee0979);
+            color: white;
+            flex: 1;
+        }
+        .back-link {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            flex: 1;
+        }
+        form { flex: 1; }
+        form button { width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <h1>🛡 Travel Safety Report</h1>
+        <p>{{ location }} &nbsp;|&nbsp; {{ travel_date }}</p>
+    </div>
+
+    <div class="wrapper">
+
+        <div class="card" style="text-align:center; position:relative; overflow:hidden;">
+            <h3>🤖 AI Risk Prediction</h3>
+            <div id="riskGlowWrap" style="max-width: 280px; margin: 20px auto 0 auto; border-radius: 50%; transition: filter 0.4s ease;">
+                <canvas id="riskChart"></canvas>
+            </div>
+            <p id="riskStatusText" style="margin-top: 15px; font-size: 22px; font-weight: 700; letter-spacing:1px;"></p>
+        </div>
+
+        {% if weather %}
+        <div class="card">
+            <h3>🌤 Weather</h3>
+            <div class="weather-row">
+                <div><span>{{ weather.temperature }}°C</span>Temperature</div>
+                <div><span>{{ weather.description|capitalize }}</span>Condition</div>
+                <div><span>{{ weather.humidity }}%</span>Humidity</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h3>🗺️ Suggested Visit Order (Itinerary)</h3>
+            <ul>
+            {% for stop in info.itinerary %}
+                <li><b>{{ stop.order }}.</b> {{ stop.spot }} — <span style="opacity:0.7;">{{ stop.best_time }}</span></li>
+            {% endfor %}
+            </ul>
+            <a href="https://www.google.com/maps/dir/{% for stop in info.itinerary %}{{ stop.spot }},{{ location }}/{% endfor %}"
+               target="_blank"
+               style="display:inline-block; margin-top:12px; color:#ffb84d; text-decoration:none; font-size:14px;">
+               🧭 Open Full Route in Google Maps →
+            </a>
+        </div>
+
+        <div class="card">
+            <h3>💰 Trip Budget Estimate</h3>
+            <p>🚗 Vehicle: {{ vehicle }} | 🛣️ Distance: {{ distance_km }} km | 🗓️ Days: {{ num_days }}</p>
+            <p style="margin-top:6px;">
+                🏨 Hotel Type: {% if hotel_tier == '5_star' %}5-Star Luxury ⭐⭐⭐⭐⭐{% else %}3-Star Budget ⭐⭐⭐{% endif %}
+                (₹{{ trip_cost.hotel_per_night }}/night)
+            </p>
+
+            <div style="max-width: 480px; margin: 20px auto 5px auto;">
+                <canvas id="budgetChart"></canvas>
+            </div>
+
+            <ul style="margin-top:15px;">
+                <li>⛽ Fuel Needed: {{ trip_cost.fuel_needed_litres }} litres</li>
+                <li>⛽ Fuel Cost: ₹{{ trip_cost.fuel_cost }}</li>
+                <li>🏨 Hotel Cost ({{ num_days }} nights): ₹{{ trip_cost.hotel_cost }}</li>
+                <li>🍽️ Food Cost: ₹{{ trip_cost.food_cost }}</li>
+            </ul>
+            <p style="margin-top:15px; font-size:20px; font-weight:700; color:#ffb84d;">
+                Total Estimated Cost: ₹{{ trip_cost.total_cost }}
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>📍 Tourist Spots</h3>
+            <ul>{% for spot in info.tourist_spots %}<li>{{ spot }}</li>{% endfor %}</ul>
+        </div>
+
+        <div class="card">
+            <h3>⚠️ Danger Zones</h3>
+            <ul>{% for zone in info.danger_zones %}<li>{{ zone }}</li>{% endfor %}</ul>
+        </div>
+
+        <div class="card">
+            <h3>🚓 Police Stations</h3>
+            <ul>
+            {% for p in info.police_stations %}
+                <li>{{ p }}
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ p }},{{ location }}"
+                       target="_blank" style="color:#ffb84d; text-decoration:none; font-size:12px; margin-left:8px;">📍 View Map</a>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>⛽ Petrol Bunks</h3>
+            <ul>
+            {% for pb in info.petrol_bunks %}
+                <li>{{ pb }}
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ pb }},{{ location }}"
+                       target="_blank" style="color:#ffb84d; text-decoration:none; font-size:12px; margin-left:8px;">📍 View Map</a>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>🏨 Hotel Recommendations</h3>
+            <ul>
+            {% for h in info.hotels %}
+                <li>
+                    <b>{{ h.name }}</b>
+                    <span style="color:#ffb84d;">
+                        {% for i in range(h.stars) %}⭐{% endfor %}
+                    </span>
+                    — ₹{{ h.price_per_night }}/night
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ h.name }},{{ location }}"
+                       target="_blank" style="color:#ffb84d; text-decoration:none; font-size:12px; margin-left:6px;">📍 View Map</a>
+                    <br><span style="opacity:0.65; font-size:12.5px;">{{ h.review }}</span>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>💡 Travel Tips</h3>
+            <ul>{% for tip in info.travel_tips %}<li>{{ tip }}</li>{% endfor %}</ul>
+        </div>
+
+        <div class="btn-group">
+            <form action="/download_report" method="POST">
+                <input type="hidden" name="location" value="{{ location }}">
+                <input type="hidden" name="travel_date" value="{{ travel_date }}">
+                <button type="submit">📄 Download PDF</button>
+            </form>
+            <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div style="position:fixed; bottom:8px; right:14px; font-size:10.5px; color:rgba(255,255,255,0.35); font-family:'Poppins', sans-serif; z-index:2;">
+        Developed by Senthooran M
+    </div>
+
+    <script>
+        const riskText = "{{ risk }}";
+        let riskScore, riskColor, statusText, glowColor;
+
+        if (riskText.includes("Safe")) {
+            riskScore = 25;
+            riskColor = "#00ffb3";
+            glowColor = "rgba(0,255,179,0.65)";
+            statusText = "✅ SAFE";
+        } else if (riskText.includes("Medium")) {
+            riskScore = 60;
+            riskColor = "#ffb200";
+            glowColor = "rgba(255,178,0,0.65)";
+            statusText = "⚠️ CAUTION";
+        } else {
+            riskScore = 90;
+            riskColor = "#ff3860";
+            glowColor = "rgba(255,56,96,0.65)";
+            statusText = "🚨 NOT SAFE";
+        }
+
+        document.getElementById('riskStatusText').innerText = statusText;
+        document.getElementById('riskStatusText').style.color = riskColor;
+        document.getElementById('riskStatusText').style.textShadow = "0 0 12px " + glowColor;
+        document.getElementById('riskGlowWrap').style.filter = "drop-shadow(0 0 18px " + glowColor + ")";
+
+        const ctx = document.getElementById('riskChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Risk Level', 'Remaining'],
+                datasets: [{
+                    data: [riskScore, 100 - riskScore],
+                    backgroundColor: [riskColor, 'rgba(255,255,255,0.08)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                circumference: 180,
+                rotation: 270,
+                cutout: '75%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            }
+        });
+
+        const budgetCtx = document.getElementById('budgetChart').getContext('2d');
+        new Chart(budgetCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Fuel', 'Hotel', 'Food'],
+                datasets: [{
+                    label: 'Cost (₹)',
+                    data: [{{ trip_cost.fuel_cost }}, {{ trip_cost.hotel_cost }}, {{ trip_cost.food_cost }}],
+                    backgroundColor: ['#00e5ff', '#ff6a00', '#ee0979'],
+                    borderRadius: 8,
+                    barThickness: 55
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#c9d6dd', font: { family: 'Poppins' } }, grid: { display: false } },
+                    y: { ticks: { color: '#c9d6dd', font: { family: 'Poppins' } }, grid: { color: 'rgba(255,255,255,0.07)' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
