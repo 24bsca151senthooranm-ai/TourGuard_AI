@@ -20,6 +20,7 @@ def get_db_connection():
         user=os.environ.get("DB_USER", "root"),
         password=os.environ.get("DB_PASSWORD", "Senthooran@123"),
         database=os.environ.get("DB_NAME", "tourguard_ai")
+        port=int(os.environ.get("DB_PORT", 3306))
     )
 
 def save_search_history(username, location, travel_date, risk):
