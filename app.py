@@ -19,7 +19,7 @@ def get_db_connection():
         host=os.environ.get("DB_HOST", "localhost"),
         user=os.environ.get("DB_USER", "root"),
         password=os.environ.get("DB_PASSWORD", "Senthooran@123"),
-        database=os.environ.get("DB_NAME", "tourguard_ai")
+        database=os.environ.get("DB_NAME", "tourguard_ai"),
         port=int(os.environ.get("DB_PORT", 3306))
     )
 
