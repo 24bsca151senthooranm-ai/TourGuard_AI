@@ -201,7 +201,21 @@ def generate_pdf_report(location, travel_date, info, weather, risk):
     return pdf_path
 
 # ---------------- ROUTES ----------------
+@app.route('/about-app')
+def about_app():
+    return render_template('about.html',
+        page_title="About TourGuard_AI",
+        heading="About the App",
+        content="TourGuard_AI is a real-time, AI-powered travel safety companion. It combines a machine learning risk prediction model, live weather data, curated tourist information, smart itinerary planning, and budget estimation into a single platform - helping travellers make safer, smarter decisions before and during their trip."
+    )
 
+@app.route('/about-developer')
+def about_developer():
+    return render_template('about.html',
+        page_title="About Developer",
+        heading="About the Developer",
+        content="TourGuard_AI was designed and developed by Senthooran M, a BCA Data Analytics student at IIE, as part of Project Spark. The project brings together Flask, MySQL, Machine Learning, and data visualization to build a startup-quality, real-world travel safety solution."
+    )
 @app.route('/')
 def home():
     return render_template('login.html')

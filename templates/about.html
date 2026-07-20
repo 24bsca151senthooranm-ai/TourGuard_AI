@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ page_title }} - TourGuard_AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            min-height: 100vh;
+            background: #060d14;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+        .card {
+            max-width: 620px;
+            background: rgba(6,20,30,0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0,229,255,0.3);
+            border-radius: 18px;
+            padding: 45px;
+            box-shadow: 0 0 30px rgba(0,229,255,0.15), 0 20px 45px rgba(0,0,0,0.4);
+            color: white;
+            text-align: center;
+        }
+        .card h1 {
+            font-size: 26px;
+            color: #ffb84d;
+            margin-bottom: 18px;
+        }
+        .card p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #c9d6dd;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 28px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff6a3d, #ee0979);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .back-link:hover { box-shadow: 0 0 20px rgba(0,229,255,0.4); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🛡 {{ heading }}</h1>
+        <p>{{ content }}</p>
+        <a href="/" class="back-link">← Back to Login</a>
+    </div>
+</body>
+</html>
