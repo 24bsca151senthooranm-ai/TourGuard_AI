@@ -214,7 +214,6 @@ def generate_pdf_report(location, travel_date, info, weather, risk):
     pdf = WatermarkPDF()
     pdf.add_page()
 
-    # ---------- Header Banner ----------
     pdf.set_fill_color(23, 35, 47)
     pdf.rect(0, 0, 210, 30, 'F')
     pdf.set_xy(0, 8)
@@ -226,12 +225,12 @@ def generate_pdf_report(location, travel_date, info, weather, risk):
     pdf.set_x(0)
     pdf.cell(210, 8, txt=f"{location}   |   Travel Date: {travel_date}", align='C', ln=True)
     pdf.set_text_color(0, 0, 0)
-    pdf.set_y(38)
+    pdf.set_xy(pdf.l_margin, 38)
 
-    # ---------- Risk + Weather Row ----------
     pdf.set_font("Arial", 'B', 12)
     pdf.set_fill_color(23, 35, 47)
     pdf.set_text_color(255, 255, 255)
+    pdf.set_x(pdf.l_margin)
     pdf.cell(95, 9, txt="AI Risk Prediction", border=0, fill=True, align='C')
     pdf.cell(95, 9, txt="Weather Conditions", border=0, fill=True, align='C', ln=True)
 
@@ -241,18 +240,18 @@ def generate_pdf_report(location, travel_date, info, weather, risk):
     risk_clean = risk.encode('latin-1', 'ignore').decode('latin-1')
     weather_text = f"{weather['temperature']}C, {weather['description']}, {weather['humidity']}% humidity" if weather else "N/A"
     weather_clean = weather_text.encode('latin-1', 'ignore').decode('latin-1')
+    pdf.set_x(pdf.l_margin)
     pdf.cell(95, 10, txt=risk_clean, border=0, fill=True, align='C')
     pdf.cell(95, 10, txt=weather_clean, border=0, fill=True, align='C', ln=True)
     pdf.ln(8)
 
-    # ---------- Content Sections ----------
     section_box(pdf, "Tourist Spots", info.get('tourist_spots', []))
     section_box(pdf, "Danger Zones", info.get('danger_zones', []))
     section_box(pdf, "Police Stations", info.get('police_stations', []))
     section_box(pdf, "Petrol Bunks", info.get('petrol_bunks', []))
     section_box(pdf, "Travel Tips", info.get('travel_tips', []))
 
-    # ---------- Hotels Table ----------
+    pdf.set_x(pdf.l_margin)
     pdf.set_font("Arial", 'B', 12.5)
     pdf.set_fill_color(23, 35, 47)
     pdf.set_text_color(255, 255, 255)
@@ -261,6 +260,7 @@ def generate_pdf_report(location, travel_date, info, weather, risk):
     pdf.set_font("Arial", 'B', 9.5)
     pdf.set_fill_color(225, 230, 235)
     pdf.set_text_color(20, 20, 20)
+    pdf.set_x(pdf.l_margin)
     pdf.cell(65, 8, txt="Hotel Name", border=1, fill=True, align='C')
     pdf.cell(22, 8, txt="Rating", border=1, fill=True, align='C')
     pdf.cell(32, 8, txt="Price/Night", border=1, fill=True, align='C')
@@ -272,17 +272,17 @@ def generate_pdf_report(location, travel_date, info, weather, risk):
         stars = str(h.get('stars', 0)) + " star"
         price = f"Rs.{h['price_per_night']}"
         review_clean = h.get('review', '')[:50].encode('latin-1', 'ignore').decode('latin-1')
+        pdf.set_x(pdf.l_margin)
         pdf.cell(65, 8, txt=name_clean, border=1)
         pdf.cell(22, 8, txt=stars, border=1, align='C')
         pdf.cell(32, 8, txt=price, border=1, align='C')
         pdf.cell(71, 8, txt=review_clean, border=1, ln=True)
 
-
-static_dir = os.path.join(os.path.dirname(__file__), 'static')
-os.makedirs(static_dir, exist_ok=True)
-pdf_path = os.path.join(static_dir, 'travel_report.pdf')
-pdf.output(pdf_path)
-return pdf_path
+    static_dir = os.path.join(os.path.dirname(__file__), 'static')
+    os.makedirs(static_dir, exist_ok=True)
+    pdf_path = os.path.join(static_dir, 'travel_report.pdf')
+    pdf.output(pdf_path)
+    return pdf_path
 
 # ---------------- ROUTES ----------------
 @app.route('/about-app')
