@@ -277,9 +277,12 @@ def generate_pdf_report(location, travel_date, info, weather, risk):
         pdf.cell(32, 8, txt=price, border=1, align='C')
         pdf.cell(71, 8, txt=review_clean, border=1, ln=True)
 
-    pdf_path = os.path.join(os.path.dirname(__file__), 'static', 'travel_report.pdf')
-    pdf.output(pdf_path)
-    return pdf_path
+
+static_dir = os.path.join(os.path.dirname(__file__), 'static')
+os.makedirs(static_dir, exist_ok=True)
+pdf_path = os.path.join(static_dir, 'travel_report.pdf')
+pdf.output(pdf_path)
+return pdf_path
 
 # ---------------- ROUTES ----------------
 @app.route('/about-app')
