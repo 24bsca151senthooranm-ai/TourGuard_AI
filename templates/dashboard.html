@@ -14,6 +14,7 @@
             background: linear-gradient(180deg, #0a1622, #0d1e2d);
             border-right: 1px solid rgba(90,140,180,0.25);
             z-index: 10; display: flex; flex-direction: column; padding: 32px 0;
+            flex-shrink: 0;
         }
         .sidebar .brand { text-align: center; color: #e8eef3; font-weight: 700; font-size: 16px; margin-bottom: 30px; }
         .sidebar .brand .icon { display: block; font-size: 24px; margin-bottom: 6px; }
@@ -31,20 +32,28 @@
                 linear-gradient(180deg, rgba(6,14,26,0.65) 0%, rgba(6,14,26,0.8) 55%, rgba(4,9,18,0.94) 100%),
                 url('https://images.unsplash.com/photo-1763583759309-23081fb2b23a?fm=jpg&q=80&w=1800&auto=format&fit=crop');
             background-size: cover; background-position: center; background-attachment: fixed;
-            display: flex; flex-direction: column; align-items: center; padding: 55px 20px;
+            padding: 45px 50px;
         }
         .vignette { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 45%, rgba(3,8,16,0.55) 100%); }
 
-        .brand-wrap { position: relative; z-index: 1; text-align: center; margin-bottom: 30px; }
-        .brand-wrap h1 { font-size: 28px; font-weight: 700; color: #eef4f8; text-shadow: 0 2px 14px rgba(0,0,0,0.6); }
-        .brand-wrap p { color: rgba(220,232,240,0.8); font-size: 13px; margin-top: 6px; text-shadow: 0 1px 6px rgba(0,0,0,0.5); }
+        .brand-wrap { position: relative; z-index: 1; margin-bottom: 32px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+        .brand-wrap h1 { font-size: 27px; font-weight: 700; color: #eef4f8; text-shadow: 0 2px 14px rgba(0,0,0,0.6); }
+        .brand-wrap p { color: rgba(220,232,240,0.8); font-size: 13px; margin-top: 5px; text-shadow: 0 1px 6px rgba(0,0,0,0.5); }
+
+        .layout {
+            position: relative; z-index: 1;
+            max-width: 1200px; margin: 0 auto;
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 26px;
+            align-items: start;
+        }
 
         .dash-panel {
-            position: relative; z-index: 1; width: 420px;
             background: linear-gradient(155deg, #17232f 0%, #0d151e 60%, #0a1119 100%);
             border: 1px solid rgba(120,160,190,0.28);
-            border-radius: 18px; padding: 32px 36px 30px 36px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04);
+            border-radius: 18px; padding: 30px 34px 28px 34px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
         }
         .dash-top {
             display: flex; align-items: center; justify-content: space-between;
@@ -71,7 +80,49 @@
         .dash-strip .indicator { display: flex; align-items: center; gap: 6px; font-size: 9px; color: rgba(200,215,225,0.45); letter-spacing: 0.5px; }
         .dash-strip .dot { width: 6px; height: 6px; border-radius: 50%; background: #4a9fd8; box-shadow: 0 0 6px #4a9fd8; }
 
+        .right-col { display: grid; gap: 22px; }
+        .info-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+        .info-card {
+            background: linear-gradient(155deg, rgba(23,35,47,0.9) 0%, rgba(13,21,30,0.9) 60%, rgba(10,17,25,0.9) 100%);
+            border: 1px solid rgba(120,160,190,0.22);
+            border-radius: 14px; padding: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        .info-card .ic { font-size: 22px; margin-bottom: 10px; }
+        .info-card .val { font-size: 20px; font-weight: 700; color: #eef4f8; }
+        .info-card .cap { font-size: 10.5px; color: rgba(200,220,235,0.55); margin-top: 3px; letter-spacing: 0.3px; text-transform: uppercase; }
+
+        .wide-card {
+            background: linear-gradient(155deg, rgba(23,35,47,0.9) 0%, rgba(13,21,30,0.9) 60%, rgba(10,17,25,0.9) 100%);
+            border: 1px solid rgba(120,160,190,0.22);
+            border-radius: 16px; padding: 26px 28px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        .wide-card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #7fc4ff; margin-bottom: 16px; }
+        .step-list { display: grid; gap: 14px; }
+        .step-row { display: flex; align-items: center; gap: 14px; }
+        .step-num {
+            width: 30px; height: 30px; border-radius: 50%; background: rgba(74,159,216,0.15);
+            border: 1px solid rgba(74,159,216,0.4); color: #7fc4ff; font-size: 12.5px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .step-text { font-size: 12.5px; color: rgba(224,235,242,0.85); line-height: 1.5; }
+        .step-text b { color: #eef4f8; }
+
+        .destinations-strip { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+        .dest-chip {
+            padding: 8px 16px; border-radius: 20px; background: rgba(127,196,255,0.08);
+            border: 1px solid rgba(127,196,255,0.25); font-size: 11.5px; color: #7fc4ff;
+        }
+
         .footer-credit { position: fixed; bottom: 8px; right: 14px; font-size: 10.5px; color: rgba(255,255,255,0.35); z-index: 20; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 1000px) {
+            .layout { grid-template-columns: 1fr; }
+            .info-row { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -91,61 +142,163 @@
             <p>AI-powered travel safety analysis in seconds</p>
         </div>
 
-        <div class="dash-panel">
-            <div class="dash-top">
-                <div class="gauge-ring"></div>
-                <div>
-                    <div class="label">Trip Setup</div>
-                    <div class="value">Journey Parameters</div>
+        <div class="layout">
+
+            <div class="dash-panel">
+                <div class="dash-top">
+                    <div class="gauge-ring"></div>
+                    <div>
+                        <div class="label">Trip Setup</div>
+                        <div class="value">Journey Parameters</div>
+                    </div>
+                    <div class="gauge-ring"></div>
                 </div>
-                <div class="gauge-ring"></div>
+
+                <form action="/analyze" method="POST" id="tripForm">
+                    <label>Destination</label>
+                    <select name="location" required>
+                        <option value="">-- Choose Location --</option>
+                        <option value="Munnar">Munnar</option>
+                        <option value="Ooty">Ooty</option>
+                        <option value="Kodaikanal">Kodaikanal</option>
+                        <option value="Coorg">Coorg</option>
+                        <option value="Goa">Goa</option>
+                    </select>
+
+                    <label>Travel Date</label>
+                    <input type="date" name="travel_date" required>
+
+                    <label>Vehicle Type</label>
+                    <select name="vehicle" required>
+                        <option value="">-- Choose Vehicle --</option>
+                        <option value="Car">Car</option>
+                        <option value="Bike">Bike</option>
+                    </select>
+
+                    <label>Total Distance (KM, round trip)</label>
+                    <input type="number" name="distance_km" placeholder="e.g. 300" required>
+
+                    <label>Number of Days</label>
+                    <input type="number" name="num_days" placeholder="e.g. 2" required>
+
+                    <label>Hotel Preference</label>
+                    <select name="hotel_tier" required>
+                        <option value="">-- Choose Hotel Type --</option>
+                        <option value="3_star">3-Star (Budget Friendly)</option>
+                        <option value="5_star">5-Star (Luxury)</option>
+                    </select>
+
+                    <button type="submit">Analyze My Trip</button>
+                </form>
+
+                <div class="dash-strip">
+                    <span class="indicator"><span class="dot"></span> SECURE</span>
+                    <span class="indicator"><span class="dot"></span> AI-POWERED</span>
+                    <span class="indicator"><span class="dot"></span> REAL-TIME</span>
+                </div>
             </div>
 
-            <form action="/analyze" method="POST">
-                <label>Destination</label>
-                <select name="location" required>
-                    <option value="">-- Choose Location --</option>
-                    <option value="Munnar">Munnar</option>
-                    <option value="Ooty">Ooty</option>
-                    <option value="Kodaikanal">Kodaikanal</option>
-                    <option value="Coorg">Coorg</option>
-                    <option value="Goa">Goa</option>
-                </select>
+            <div class="right-col">
+                <div class="info-row">
+                    <div class="info-card">
+                        <div class="ic">📍</div>
+                        <div class="val">5</div>
+                        <div class="cap">Destinations Covered</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="ic">🤖</div>
+                        <div class="val">3</div>
+                        <div class="cap">AI Risk Categories</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="ic">⚡</div>
+                        <div class="val">&lt; 5 sec</div>
+                        <div class="cap">Analysis Time</div>
+                    </div>
+                </div>
 
-                <label>Travel Date</label>
-                <input type="date" name="travel_date" required>
+                <div class="wide-card">
+                    <h3>How It Works</h3>
+                    <div class="step-list">
+                        <div class="step-row">
+                            <div class="step-num">1</div>
+                            <div class="step-text"><b>Choose your destination and date</b> — the AI uses this to fetch live weather and seasonal context.</div>
+                        </div>
+                        <div class="step-row">
+                            <div class="step-num">2</div>
+                            <div class="step-text"><b>Set your vehicle, distance and hotel tier</b> — this drives an instant fuel and stay budget estimate.</div>
+                        </div>
+                        <div class="step-row">
+                            <div class="step-num">3</div>
+                            <div class="step-text"><b>Click Analyze My Trip</b> — get a risk score, a plain-language explanation, itinerary and full PDF report.</div>
+                        </div>
+                    </div>
+                </div>
 
-                <label>Vehicle Type</label>
-                <select name="vehicle" required>
-                    <option value="">-- Choose Vehicle --</option>
-                    <option value="Car">Car</option>
-                    <option value="Bike">Bike</option>
-                </select>
-
-                <label>Total Distance (KM, round trip)</label>
-                <input type="number" name="distance_km" placeholder="e.g. 300" required>
-
-                <label>Number of Days</label>
-                <input type="number" name="num_days" placeholder="e.g. 2" required>
-
-                <label>Hotel Preference</label>
-                <select name="hotel_tier" required>
-                    <option value="">-- Choose Hotel Type --</option>
-                    <option value="3_star">3-Star (Budget Friendly)</option>
-                    <option value="5_star">5-Star (Luxury)</option>
-                </select>
-
-                <button type="submit">Analyze My Trip</button>
-            </form>
-
-            <div class="dash-strip">
-                <span class="indicator"><span class="dot"></span> SECURE</span>
-                <span class="indicator"><span class="dot"></span> AI-POWERED</span>
-                <span class="indicator"><span class="dot"></span> REAL-TIME</span>
+                <div class="wide-card">
+                    <h3>Available Destinations</h3>
+                    <div class="destinations-strip">
+                        <span class="dest-chip">🏔 Munnar</span>
+                        <span class="dest-chip">🌿 Ooty</span>
+                        <span class="dest-chip">⛰️ Kodaikanal</span>
+                        <span class="dest-chip">☕ Coorg</span>
+                        <span class="dest-chip">🏖️ Goa</span>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 
+    <div id="analyzingOverlay" style="display:none; position:fixed; inset:0; z-index:999; background:rgba(4,9,18,0.96); backdrop-filter: blur(6px); align-items:center; justify-content:center; flex-direction:column;">
+        <div style="width:90px; height:90px; border-radius:50%; border:3px solid rgba(74,159,216,0.2); border-top-color:#4a9fd8; animation: spin 1s linear infinite;"></div>
+        <div id="analyzingText" style="margin-top:28px; color:#eef4f8; font-size:16px; font-weight:600; font-family:'Poppins',sans-serif;">Fetching live weather...</div>
+        <div style="width:280px; height:5px; background:rgba(255,255,255,0.1); border-radius:3px; margin-top:20px; overflow:hidden;">
+            <div id="analyzingBar" style="width:0%; height:100%; background:linear-gradient(90deg,#2f6fa3,#7fc4ff); border-radius:3px; transition: width 0.3s linear;"></div>
+        </div>
+        <div style="margin-top:14px; color:rgba(200,220,235,0.5); font-size:11.5px; font-family:'Poppins',sans-serif;">TourGuard_AI is analyzing your trip</div>
+    </div>
+
     <div class="footer-credit">Developed by Senthooran M</div>
+
+    <script>
+        const tripForm = document.getElementById('tripForm');
+        tripForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const overlay = document.getElementById('analyzingOverlay');
+            const textEl = document.getElementById('analyzingText');
+            const barEl = document.getElementById('analyzingBar');
+            overlay.style.display = 'flex';
+
+            const steps = [
+                "Fetching live weather...",
+                "Running AI risk model...",
+                "Building your itinerary...",
+                "Calculating trip budget...",
+                "Finalizing your report..."
+            ];
+            let stepIndex = 0;
+            textEl.innerText = steps[0];
+
+            const stepInterval = setInterval(() => {
+                stepIndex++;
+                if (stepIndex < steps.length) {
+                    textEl.innerText = steps[stepIndex];
+                }
+            }, 1000);
+
+            let progress = 0;
+            const barInterval = setInterval(() => {
+                progress += 2;
+                barEl.style.width = Math.min(progress, 100) + '%';
+            }, 100);
+
+            setTimeout(() => {
+                clearInterval(stepInterval);
+                clearInterval(barInterval);
+                tripForm.submit();
+            }, 5000);
+        });
+    </script>
 </body>
 </html>
