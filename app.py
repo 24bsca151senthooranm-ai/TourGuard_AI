@@ -3,11 +3,23 @@ import mysql.connector
 import requests
 import joblib
 import os
+import requests as http_requests
+from oauthlib.oauth2 import WebApplicationClient
 import textwrap
 from fpdf import FPDF
 
 app = Flask(__name__)
 app.secret_key = 'tourguard_secret_key'
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
+
+google_client = WebApplicationClient(GOOGLE_CLIENT_ID)
+
+def get_google_provider_cfg():
+    return http_requests.get(GOOGLE_DISCOVERY_URL).json()
 
 # ---------------- Travel Data Import ----------------
 import sys
@@ -329,6 +341,70 @@ def login():
         return render_template('dashboard.html', username=username)
     else:
         return "Invalid Username or Password! <a href='/'>Try Again</a>"
+
+
+@app.route('/google-login')
+def google_login():
+    google_provider_cfg = get_google_provider_cfg()
+    authorization_endpoint = google_provider_cfg["authorization_endpoint"]
+
+    request_uri = google_client.prepare_request_uri(
+        authorization_endpoint,
+        redirect_uri=request.base_url.replace("google-login", "google-callback"),
+        scope=["openid", "email", "profile"],
+    )
+    return redirect(request_uri)
+
+
+@app.route('/google-callback')
+def google_callback():
+    code = request.args.get("code")
+    google_provider_cfg = get_google_provider_cfg()
+    token_endpoint = google_provider_cfg["token_endpoint"]
+
+    token_url, headers, body = google_client.prepare_token_request(
+        token_endpoint,
+        authorization_response=request.url,
+        redirect_url=request.base_url,
+        code=code,
+    )
+    token_response = http_requests.post(
+        token_url,
+        headers=headers,
+        data=body,
+        auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
+    )
+
+    google_client.parse_request_body_response(token_response.text)
+
+    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
+    uri, headers, body = google_client.add_token(userinfo_endpoint)
+    userinfo_response = http_requests.get(uri, headers=headers, data=body)
+    userinfo = userinfo_response.json()
+
+    if userinfo.get("email_verified"):
+        users_email = userinfo["email"]
+        users_name = userinfo.get("name", users_email.split("@")[0])
+    else:
+        return "Google account not verified.", 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE username=%s", (users_email,))
+    user = cursor.fetchone()
+
+    if not user:
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (%s, %s)",
+            (users_email, "google_auth_user")
+        )
+        conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    session['username'] = users_name
+    return redirect('/dashboard')
 
 @app.route('/dashboard')
 def dashboard():
