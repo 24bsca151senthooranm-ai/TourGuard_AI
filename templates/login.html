@@ -38,6 +38,7 @@
             font-weight: 500;
             border-left: 3px solid transparent;
             transition: 0.25s;
+            cursor: pointer;
         }
         .side-link:hover, .side-link.active {
             color: #7fc4ff;
@@ -181,8 +182,8 @@
     <div class="sidebar">
         <div class="brand"><span class="icon">🛡</span>TourGuard_AI</div>
         <a href="/" class="side-link active">Log In ID</a>
-        <a href="/about-app" class="side-link">About App</a>
-        <a href="/about-developer" class="side-link">About Developer</a>
+        <a href="#" class="side-link" onclick="openAboutModal('app'); return false;">About App</a>
+        <a href="#" class="side-link" onclick="openAboutModal('developer'); return false;">About Developer</a>
     </div>
 
     <div class="scene">
@@ -235,6 +236,10 @@
                         Continue with Google
                     </a>
 
+                    <p style="text-align:center; margin-top:16px; font-size:12px; color:rgba(200,220,235,0.6);">
+                        New here? <a href="/signup" style="color:#7fc4ff; text-decoration:none; font-weight:600;">Create an Account</a>
+                    </p>
+
                     <div class="dash-strip">
                         <span class="indicator"><span class="dot"></span> SECURE</span>
                         <span class="indicator"><span class="dot"></span> ENCRYPTED</span>
@@ -247,6 +252,16 @@
     </div>
 
     <div class="footer-credit">Developed by Senthooran M</div>
+
+    <div id="aboutModal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(4,9,18,0.85); backdrop-filter: blur(6px); align-items:center; justify-content:center;">
+        <div style="width:560px; max-width:90%; background:linear-gradient(155deg, #17232f 0%, #0d151e 60%, #0a1119 100%); border:1px solid rgba(120,160,190,0.3); border-radius:18px; padding:38px 40px; box-shadow:0 30px 60px rgba(0,0,0,0.55); position:relative;">
+            <span onclick="closeAboutModal()" style="position:absolute; top:16px; right:20px; color:rgba(200,220,235,0.5); font-size:20px; cursor:pointer;">&times;</span>
+            <div id="aboutIcon" style="font-size:36px; text-align:center; margin-bottom:10px;">🛡</div>
+            <h2 id="aboutTitle" style="text-align:center; color:#eef4f8; font-size:20px; margin-bottom:4px; font-family:'Poppins',sans-serif;"></h2>
+            <p id="aboutRole" style="text-align:center; color:#7fc4ff; font-size:12px; font-weight:600; margin-bottom:18px; font-family:'Poppins',sans-serif;"></p>
+            <div id="aboutTypewriter" style="font-size:13.5px; line-height:1.8; color:rgba(224,235,242,0.9); min-height:150px; font-family:'Poppins',sans-serif;"></div>
+        </div>
+    </div>
 
     <script>
         function showDashboard() {
@@ -265,6 +280,73 @@
                 s.style.opacity = '1';
                 s.style.transform = 'translateY(0)';
             }, 200);
+        }
+
+        const aboutContent = {
+            app: {
+                icon: "🛡",
+                title: "About the App",
+                role: "",
+                paragraphs: [
+                    "TourGuard_AI is a real-time, AI-powered travel safety companion built to help travellers make safer, smarter decisions before and during their trip.",
+                    "It combines a machine learning risk prediction model, live weather data, curated tourist information, smart itinerary planning, and budget estimation into a single, easy-to-use platform.",
+                    "From login to a complete downloadable report, every step is designed to be fast, secure, and genuinely useful for real-world travel planning."
+                ]
+            },
+            developer: {
+                icon: "👨‍💻",
+                title: "Senthooran M",
+                role: "BCA Data Analytics · Placement Coordinator · IIE",
+                paragraphs: [
+                    "Senthooran M is a third-year BCA Data Analytics student at Sri Krishna Adithya College of Arts and Science, Coimbatore, and also serves as the Placement Coordinator for his department.",
+                    "He completed a specialized Data Analytics course at IIE, where TourGuard_AI was conceived and built as part of Project Spark.",
+                    "TourGuard_AI reflects his interest in combining data analytics, machine learning, and thoughtful UI design to build products that solve genuine, everyday problems."
+                ]
+            }
+        };
+
+        function openAboutModal(type) {
+            const data = aboutContent[type];
+            document.getElementById('aboutIcon').innerText = data.icon;
+            document.getElementById('aboutTitle').innerText = data.title;
+            document.getElementById('aboutRole').innerText = data.role;
+
+            const box = document.getElementById('aboutTypewriter');
+            box.innerHTML = '';
+            document.getElementById('aboutModal').style.display = 'flex';
+
+            let pIndex = 0;
+            function typeParagraph() {
+                if (pIndex >= data.paragraphs.length) return;
+                const p = document.createElement('p');
+                p.style.marginBottom = '12px';
+                box.appendChild(p);
+                const text = data.paragraphs[pIndex];
+                let i = 0;
+                const cursor = document.createElement('span');
+                cursor.style.borderRight = '2px solid #7fc4ff';
+                cursor.style.marginLeft = '2px';
+                p.appendChild(document.createTextNode(''));
+                p.appendChild(cursor);
+
+                function step() {
+                    if (i < text.length) {
+                        cursor.insertAdjacentText('beforebegin', text[i]);
+                        i++;
+                        setTimeout(step, 14);
+                    } else {
+                        cursor.remove();
+                        pIndex++;
+                        setTimeout(typeParagraph, 200);
+                    }
+                }
+                step();
+            }
+            typeParagraph();
+        }
+
+        function closeAboutModal() {
+            document.getElementById('aboutModal').style.display = 'none';
         }
     </script>
 </body>

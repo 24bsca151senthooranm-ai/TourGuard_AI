@@ -3,6 +3,10 @@ import mysql.connector
 import requests
 import joblib
 import os
+import smtplib
+from email.mime.text import MIMEText
+import random
+import time
 import requests as http_requests
 from oauthlib.oauth2 import WebApplicationClient
 import textwrap
@@ -10,6 +14,20 @@ from fpdf import FPDF
 
 app = Flask(__name__)
 app.secret_key = 'tourguard_secret_key'
+EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS", "")
+EMAIL_APP_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD", "")
+
+otp_store = {}
+
+def send_otp_email(receiver_email, otp):
+    msg = MIMEText(f"Your TourGuard_AI verification code is: {otp}\n\nThis code expires in 5 minutes.")
+    msg['Subject'] = "TourGuard_AI - Your Verification Code"
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = receiver_email
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        smtp.login(EMAIL_ADDRESS, EMAIL_APP_PASSWORD)
+        smtp.send_message(msg)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
@@ -342,6 +360,74 @@ def login():
     else:
         return "Invalid Username or Password! <a href='/'>Try Again</a>"
 
+@app.route('/send-otp', methods=['POST'])
+def send_otp():
+    email = request.form['email']
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE username=%s", (email,))
+    existing = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if existing:
+        return render_template('signup.html', stage='email', error="This email is already registered. Please login instead.")
+
+    otp = str(random.randint(100000, 999999))
+    otp_store[email] = {"otp": otp, "expires": time.time() + 300}
+
+    try:
+        send_otp_email(email, otp)
+    except Exception as e:
+        return render_template('signup.html', stage='email', error="Could not send OTP. Please check the email and try again.")
+
+    return render_template('signup.html', stage='otp', email=email)
+
+
+@app.route('/verify-otp', methods=['POST'])
+def verify_otp():
+    email = request.form['email']
+    entered_otp = request.form['otp']
+
+    record = otp_store.get(email)
+
+    if not record:
+        return render_template('signup.html', stage='email', error="OTP session expired. Please try again.")
+
+    if time.time() > record['expires']:
+        del otp_store[email]
+        return render_template('signup.html', stage='email', error="OTP expired. Please request a new one.")
+
+    if entered_otp != record['otp']:
+        return render_template('signup.html', stage='otp', email=email, error="Incorrect OTP. Please try again.")
+
+    del otp_store[email]
+    return render_template('signup.html', stage='create_account', email=email)
+
+
+@app.route('/create-account', methods=['POST'])
+def create_account():
+    email = request.form['email']
+    username = request.form['username']
+    password = request.form['password']
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO users (username, password) VALUES (%s, %s)",
+        (username, password)
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return redirect('/?signup=success')
+
+
+@app.route('/signup')
+def signup_page():
+    return render_template('signup.html', stage='email')
 
 @app.route('/google-login')
 def google_login():
