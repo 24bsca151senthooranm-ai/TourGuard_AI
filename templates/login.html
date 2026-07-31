@@ -254,7 +254,7 @@
     <div class="footer-credit">Developed by Senthooran M</div>
 
     <div id="aboutModal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(4,9,18,0.85); backdrop-filter: blur(6px); align-items:center; justify-content:center;">
-        <div style="width:560px; max-width:90%; background:linear-gradient(155deg, #17232f 0%, #0d151e 60%, #0a1119 100%); border:1px solid rgba(120,160,190,0.3); border-radius:18px; padding:38px 40px; box-shadow:0 30px 60px rgba(0,0,0,0.55); position:relative;">
+        <div style="width:560px; max-width:90%; background:linear-gradient(155deg, #17232f 0%, #0d151e 60%, #0a1119 100%); border:1px solid rgba(120,160,190,0.3); border-radius:18px; padding:38px 40px; box-shadow:0 30px 60px rgba(0,0,0,0.55); position:relative; max-height:80vh; overflow-y:auto;">
             <span onclick="closeAboutModal()" style="position:absolute; top:16px; right:20px; color:rgba(200,220,235,0.5); font-size:20px; cursor:pointer;">&times;</span>
             <div id="aboutIcon" style="font-size:36px; text-align:center; margin-bottom:10px;">🛡</div>
             <h2 id="aboutTitle" style="text-align:center; color:#eef4f8; font-size:20px; margin-bottom:4px; font-family:'Poppins',sans-serif;"></h2>
@@ -287,21 +287,26 @@
                 icon: "🛡",
                 title: "About the App",
                 role: "",
-                paragraphs: [
-                    "TourGuard_AI is a real-time, AI-powered travel safety companion built to help travellers make safer, smarter decisions before and during their trip.",
+                typeText: "TourGuard_AI is a real-time, AI-powered travel safety companion built to help travellers make safer, smarter decisions before and during their trip.",
+                extra: [
                     "It combines a machine learning risk prediction model, live weather data, curated tourist information, smart itinerary planning, and budget estimation into a single, easy-to-use platform.",
                     "From login to a complete downloadable report, every step is designed to be fast, secure, and genuinely useful for real-world travel planning."
-                ]
+                ],
+                chips: [],
+                quote: ""
             },
             developer: {
                 icon: "👨‍💻",
                 title: "Senthooran M",
-                role: "BCA Data Analytics · Placement Coordinator · IIE",
-                paragraphs: [
-                    "Senthooran M is a third-year BCA Data Analytics student at Sri Krishna Adithya College of Arts and Science, Coimbatore, and also serves as the Placement Coordinator for his department.",
-                    "He completed a specialized Data Analytics course at IIE, where TourGuard_AI was conceived and built as part of Project Spark.",
-                    "TourGuard_AI reflects his interest in combining data analytics, machine learning, and thoughtful UI design to build products that solve genuine, everyday problems."
-                ]
+                role: "BCA Student | Data Analytics Enthusiast | AI & Web Developer",
+                typeText: "I am Senthooran M, a Bachelor of Computer Applications student at Sri Krishna Adithya College of Arts and Science, Coimbatore, with a strong passion for building technology-driven solutions that solve real-world problems.",
+                extra: [
+                    "My interests span Artificial Intelligence, Data Analytics, Machine Learning, Web Development, and Business Intelligence. I believe technology should not only solve problems but also enhance user experiences through intelligent, reliable and scalable solutions.",
+                    "TourGuard_AI represents my commitment to leveraging AI for public safety and smart tourism — combining machine learning, real-time weather analysis, location-based intelligence, and an intuitive interface to help travellers plan safer trips.",
+                    "Professional Objective: To begin my career in an innovative organization where I can contribute through analytical thinking, software development, and AI-driven solutions — building digital products that deliver practical, everyday value."
+                ],
+                chips: ["AI & Machine Learning", "Data Analytics & BI", "Python & Flask", "HTML5 / CSS3 / Bootstrap", "MySQL", "Power BI & Tableau", "Data Visualization"],
+                quote: "\u201cInnovation begins with curiosity, grows through continuous learning, and creates impact through meaningful solutions.\u201d"
             }
         };
 
@@ -315,34 +320,65 @@
             box.innerHTML = '';
             document.getElementById('aboutModal').style.display = 'flex';
 
-            let pIndex = 0;
-            function typeParagraph() {
-                if (pIndex >= data.paragraphs.length) return;
-                const p = document.createElement('p');
-                p.style.marginBottom = '12px';
-                box.appendChild(p);
-                const text = data.paragraphs[pIndex];
-                let i = 0;
-                const cursor = document.createElement('span');
-                cursor.style.borderRight = '2px solid #7fc4ff';
-                cursor.style.marginLeft = '2px';
-                p.appendChild(document.createTextNode(''));
-                p.appendChild(cursor);
+            const introP = document.createElement('p');
+            introP.style.marginBottom = '14px';
+            box.appendChild(introP);
+            let i = 0;
+            const cursor = document.createElement('span');
+            cursor.style.borderRight = '2px solid #7fc4ff';
+            cursor.style.marginLeft = '2px';
+            introP.appendChild(document.createTextNode(''));
+            introP.appendChild(cursor);
 
-                function step() {
-                    if (i < text.length) {
-                        cursor.insertAdjacentText('beforebegin', text[i]);
-                        i++;
-                        setTimeout(step, 14);
-                    } else {
-                        cursor.remove();
-                        pIndex++;
-                        setTimeout(typeParagraph, 200);
-                    }
+            function step() {
+                if (i < data.typeText.length) {
+                    cursor.insertAdjacentText('beforebegin', data.typeText[i]);
+                    i++;
+                    setTimeout(step, 10);
+                } else {
+                    cursor.remove();
+                    revealExtra(data, box);
                 }
-                step();
             }
-            typeParagraph();
+            step();
+        }
+
+        function revealExtra(data, box) {
+            data.extra.forEach((para, idx) => {
+                const p = document.createElement('p');
+                p.innerText = para;
+                p.style.marginBottom = '12px';
+                p.style.opacity = '0';
+                p.style.transition = 'opacity 0.5s ease';
+                box.appendChild(p);
+                setTimeout(() => { p.style.opacity = '1'; }, 150 * (idx + 1));
+            });
+
+            if (data.chips && data.chips.length) {
+                const chipWrap = document.createElement('div');
+                chipWrap.style.display = 'flex';
+                chipWrap.style.flexWrap = 'wrap';
+                chipWrap.style.gap = '8px';
+                chipWrap.style.margin = '14px 0';
+                chipWrap.style.opacity = '0';
+                chipWrap.style.transition = 'opacity 0.5s ease';
+                data.chips.forEach(c => {
+                    const chip = document.createElement('span');
+                    chip.innerText = c;
+                    chip.style.cssText = 'padding:6px 13px; border-radius:16px; background:rgba(127,196,255,0.08); border:1px solid rgba(127,196,255,0.25); font-size:10.5px; color:#7fc4ff;';
+                    chipWrap.appendChild(chip);
+                });
+                box.appendChild(chipWrap);
+                setTimeout(() => { chipWrap.style.opacity = '1'; }, 700);
+            }
+
+            if (data.quote) {
+                const q = document.createElement('p');
+                q.innerText = data.quote;
+                q.style.cssText = 'font-style:italic; color:#7fc4ff; font-size:12.5px; margin-top:10px; opacity:0; transition:opacity 0.5s ease; border-left:2px solid #4a9fd8; padding-left:12px;';
+                box.appendChild(q);
+                setTimeout(() => { q.style.opacity = '1'; }, 900);
+            }
         }
 
         function closeAboutModal() {

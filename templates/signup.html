@@ -45,6 +45,24 @@
         .step-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 22px; }
         .step-dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(120,160,190,0.3); }
         .step-dots span.active { background: #4a9fd8; box-shadow: 0 0 8px #4a9fd8; }
+
+        .otp-boxes { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; }
+        .otp-boxes input {
+            width: 44px; height: 52px; text-align: center; font-size: 20px; font-weight: 700;
+            margin-bottom: 0; padding: 0;
+        }
+
+        .success-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+        .success-circle {
+            width: 68px; height: 68px; border-radius: 50%;
+            border: 2px solid #59d38c; display: flex; align-items: center; justify-content: center;
+            animation: popIn 0.4s ease;
+        }
+        .success-circle svg { width: 32px; height: 32px; }
+        .success-circle path { stroke: #59d38c; stroke-width: 3; fill: none; stroke-dasharray: 40; stroke-dashoffset: 40; animation: drawTick 0.5s ease 0.3s forwards; }
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes drawTick { to { stroke-dashoffset: 0; } }
+        .success-text { color: #59d38c; font-size: 13px; font-weight: 600; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -71,15 +89,51 @@
         {% elif stage == 'otp' %}
             <h1>Verify Your Email</h1>
             <p class="sub">We sent a 6-digit code to {{ email }}</p>
-            <form action="/verify-otp" method="POST">
+            <form action="/verify-otp" method="POST" id="otpForm">
                 <input type="hidden" name="email" value="{{ email }}">
-                <input type="text" name="otp" placeholder="Enter 6-digit code" maxlength="6" required>
+                <input type="hidden" name="otp" id="otpHidden">
+                <div class="otp-boxes">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-box">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-box">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-box">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-box">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-box">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-box">
+                </div>
                 <button type="submit">Verify Code</button>
             </form>
+            <script>
+                const boxes = document.querySelectorAll('.otp-box');
+                boxes.forEach((box, idx) => {
+                    box.addEventListener('input', () => {
+                        box.value = box.value.replace(/[^0-9]/g, '');
+                        if (box.value && idx < boxes.length - 1) boxes[idx + 1].focus();
+                    });
+                    box.addEventListener('keydown', (e) => {
+                        if (e.key === 'Backspace' && !box.value && idx > 0) boxes[idx - 1].focus();
+                    });
+                    box.addEventListener('paste', (e) => {
+                        e.preventDefault();
+                        const digits = (e.clipboardData.getData('text').match(/\d/g) || []).slice(0, 6);
+                        digits.forEach((d, i) => { if (boxes[i]) boxes[i].value = d; });
+                        if (digits.length && boxes[digits.length - 1]) boxes[digits.length - 1].focus();
+                    });
+                });
+                document.getElementById('otpForm').addEventListener('submit', function () {
+                    document.getElementById('otpHidden').value = Array.from(boxes).map(b => b.value).join('');
+                });
+                if (boxes.length) boxes[0].focus();
+            </script>
 
         {% elif stage == 'create_account' %}
+            <div class="success-wrap">
+                <div class="success-circle">
+                    <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+                </div>
+                <div class="success-text">Email Verified!</div>
+            </div>
             <h1>Almost There!</h1>
-            <p class="sub">Email verified — now create your login details</p>
+            <p class="sub">Now create your login details</p>
             <form action="/create-account" method="POST">
                 <input type="hidden" name="email" value="{{ email }}">
                 <input type="text" name="username" placeholder="Choose a username" required>
