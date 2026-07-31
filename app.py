@@ -25,9 +25,10 @@ def send_otp_email(receiver_email, otp):
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = receiver_email
 
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15) as smtp:
         smtp.login(EMAIL_ADDRESS, EMAIL_APP_PASSWORD)
         smtp.send_message(msg)
+        
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
