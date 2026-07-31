@@ -8,6 +8,7 @@ from email.mime.text import MIMEText
 import random
 import time
 import requests as http_requests
+import requests
 from oauthlib.oauth2 import WebApplicationClient
 import textwrap
 from fpdf import FPDF
@@ -20,20 +21,21 @@ EMAIL_APP_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD", "")
 otp_store = {}
 
 def send_otp_email(receiver_email, otp):
-    msg = MIMEText(f"Your TourGuard_AI verification code is: {otp}\n\nThis code expires in 5 minutes.")
-    msg['Subject'] = "TourGuard_AI - Your Verification Code"
-    msg['From'] = EMAIL_ADDRESS
-    msg['To'] = receiver_email
-
-    smtp = smtplib.SMTP('smtp.gmail.com', 587, timeout=20)
-    try:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.ehlo()
-        smtp.login(EMAIL_ADDRESS, EMAIL_APP_PASSWORD)
-        smtp.send_message(msg)
-    finally:
-        smtp.quit()
+    resend_api_key = os.environ.get("RESEND_API_KEY", "")
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {resend_api_key}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "from": "TourGuard_AI <onboarding@resend.dev>",
+        "to": [receiver_email],
+        "subject": "TourGuard_AI - Your Verification Code",
+        "text": f"Your TourGuard_AI verification code is: {otp}\n\nThis code expires in 5 minutes."
+    }
+    response = requests.post(url, headers=headers, json=data, timeout=15)
+    if response.status_code >= 400:
+        raise Exception(f"Email API error: {response.text}")
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
