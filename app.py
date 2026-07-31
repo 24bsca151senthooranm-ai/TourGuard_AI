@@ -25,10 +25,16 @@ def send_otp_email(receiver_email, otp):
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = receiver_email
 
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15) as smtp:
+    smtp = smtplib.SMTP('smtp.gmail.com', 587, timeout=20)
+    try:
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.ehlo()
         smtp.login(EMAIL_ADDRESS, EMAIL_APP_PASSWORD)
         smtp.send_message(msg)
-        
+    finally:
+        smtp.quit()
+
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
@@ -381,7 +387,7 @@ def send_otp():
     try:
         send_otp_email(email, otp)
     except Exception as e:
-        return render_template('signup.html', stage='email', error="Could not send OTP. Please check the email and try again.")
+        return render_template('signup.html', stage='email', error=f"Could not send OTP: {str(e)}")
 
     return render_template('signup.html', stage='otp', email=email)
 
