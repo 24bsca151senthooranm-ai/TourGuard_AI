@@ -8,6 +8,7 @@ import random
 import time
 import requests as http_requests
 import requests
+from datetime import datetime
 from oauthlib.oauth2 import WebApplicationClient
 import textwrap
 from fpdf import FPDF
@@ -23,6 +24,26 @@ def send_otp_email(receiver_email, otp):
     brevo_api_key = os.environ.get("BREVO_API_KEY", "")
     verified_sender = os.environ.get("BREVO_SENDER", "")
 
+    now = datetime.now().strftime("%d %b %Y, %I:%M %p")
+
+    email_body = f"""Welcome to TourGuard_AI
+
+Dear User,
+
+Your One-Time Password (OTP) for registering on TourGuard_AI is: {otp}
+
+This OTP is valid for 5 minutes from the time it was sent.
+
+Requested on: {now}
+
+Please do not share your login details with anyone. Sharing your OTP or password gives complete access to your account.
+
+If you did not request this code, please ignore this email.
+
+Thank you,
+Team TourGuard_AI
+"""
+
     url = "https://api.brevo.com/v3/smtp/email"
     headers = {
         "api-key": brevo_api_key,
@@ -31,8 +52,8 @@ def send_otp_email(receiver_email, otp):
     data = {
         "sender": {"name": "TourGuard_AI", "email": verified_sender},
         "to": [{"email": receiver_email}],
-        "subject": "TourGuard_AI - Your Verification Code",
-        "textContent": f"Your TourGuard_AI verification code is: {otp}\n\nThis code expires in 5 minutes."
+        "subject": "Welcome to TourGuard_AI - Your Verification Code",
+        "textContent": email_body
     }
     response = requests.post(url, headers=headers, json=data, timeout=15)
     if response.status_code >= 400:
