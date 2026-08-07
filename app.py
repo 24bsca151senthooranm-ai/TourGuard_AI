@@ -20,19 +20,19 @@ EMAIL_APP_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD", "")
 otp_store = {}
 
 def send_otp_email(receiver_email, otp):
-    sendgrid_api_key = os.environ.get("SENDGRID_API_KEY", "")
-    verified_sender = os.environ.get("SENDGRID_SENDER", "")
+    brevo_api_key = os.environ.get("BREVO_API_KEY", "")
+    verified_sender = os.environ.get("BREVO_SENDER", "")
 
-    url = "https://api.sendgrid.com/v3/mail/send"
+    url = "https://api.brevo.com/v3/smtp/email"
     headers = {
-        "Authorization": f"Bearer {sendgrid_api_key}",
+        "api-key": brevo_api_key,
         "Content-Type": "application/json"
     }
     data = {
-        "personalizations": [{"to": [{"email": receiver_email}]}],
-        "from": {"email": verified_sender, "name": "TourGuard_AI"},
+        "sender": {"name": "TourGuard_AI", "email": verified_sender},
+        "to": [{"email": receiver_email}],
         "subject": "TourGuard_AI - Your Verification Code",
-        "content": [{"type": "text/plain", "value": f"Your TourGuard_AI verification code is: {otp}\n\nThis code expires in 5 minutes."}]
+        "textContent": f"Your TourGuard_AI verification code is: {otp}\n\nThis code expires in 5 minutes."
     }
     response = requests.post(url, headers=headers, json=data, timeout=15)
     if response.status_code >= 400:
