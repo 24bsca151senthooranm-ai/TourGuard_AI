@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, send_file
 import mysql.connector
-import requests
 import joblib
 import os
 import smtplib
@@ -21,17 +20,19 @@ EMAIL_APP_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD", "")
 otp_store = {}
 
 def send_otp_email(receiver_email, otp):
-    resend_api_key = os.environ.get("RESEND_API_KEY", "")
-    url = "https://api.resend.com/emails"
+    sendgrid_api_key = os.environ.get("SENDGRID_API_KEY", "")
+    verified_sender = os.environ.get("SENDGRID_SENDER", "")
+
+    url = "https://api.sendgrid.com/v3/mail/send"
     headers = {
-        "Authorization": f"Bearer {resend_api_key}",
+        "Authorization": f"Bearer {sendgrid_api_key}",
         "Content-Type": "application/json"
     }
     data = {
-        "from": "TourGuard_AI <onboarding@resend.dev>",
-        "to": [receiver_email],
+        "personalizations": [{"to": [{"email": receiver_email}]}],
+        "from": {"email": verified_sender, "name": "TourGuard_AI"},
         "subject": "TourGuard_AI - Your Verification Code",
-        "text": f"Your TourGuard_AI verification code is: {otp}\n\nThis code expires in 5 minutes."
+        "content": [{"type": "text/plain", "value": f"Your TourGuard_AI verification code is: {otp}\n\nThis code expires in 5 minutes."}]
     }
     response = requests.post(url, headers=headers, json=data, timeout=15)
     if response.status_code >= 400:
